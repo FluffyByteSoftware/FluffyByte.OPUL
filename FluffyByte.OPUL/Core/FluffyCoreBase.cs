@@ -76,5 +76,6 @@ public abstract class FluffyCoreBase : IFluffyCore
         }
     }
 
-
+    protected abstract Task OnStartAsync();
+    protected abstract Task OnStopAsync();
 }
