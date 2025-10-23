@@ -13,10 +13,13 @@ public class Watcher(Sentinel sentinel) : FluffyCoreProcessBase
 
     private readonly Sentinel _sentinelRef = sentinel;
 
+    private readonly Lock _lock = new();
+
     public override string Name => "Watcher";
 
     protected override async Task OnStartAsync()
     {
+        ClearAll();
         await Task.CompletedTask;
     }
 
@@ -28,8 +31,23 @@ public class Watcher(Sentinel sentinel) : FluffyCoreProcessBase
 
     public void ClearAll()
     {
-        
         RawClientsConnected.Clear();
         AllFluffyClientsConnected.Clear();
+    }
+
+    public void RegisterRawClient(FluffyRawClient client)
+    {
+        lock (_lock)
+        {
+            RawClientsConnected.Add(client);
+        }
+    }
+
+    public void RemoveRawClient(FluffyRawClient client)
+    {
+        lock (_lock)
+        {
+            RawClientsConnected.Remove(client);
+        }
     }
 }
