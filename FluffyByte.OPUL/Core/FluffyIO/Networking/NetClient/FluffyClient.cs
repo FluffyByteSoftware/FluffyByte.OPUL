@@ -26,11 +26,22 @@ public class FluffyClient
     private bool _connected;
     private bool _disconnecting;
 
+    /// <summary>
+    /// Represents a TCP client used for network communication.
+    /// </summary>
+    /// <remarks>This field is used to manage the connection to a remote host over TCP. It is initialized when
+    /// the connection is established and should be disposed of properly to release network resources.</remarks>
     private readonly TcpClient TcpClient;
     private readonly NetworkStream _stream;
     private readonly Sentinel _sentinelReference;
     private readonly IPEndPoint? _remoteEndpoint;
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="tcpClient"></param>
+    /// <param name="sentinelReference"></param>
+    /// <param name="ct"></param>
     public FluffyClient(TcpClient tcpClient, Sentinel sentinelReference, CancellationToken ct)
     {
         _id++;
@@ -59,9 +70,6 @@ public class FluffyClient
 
     }
 
-    /// <summary>
-    /// Gracefully disconnects the client (async version).
-    /// </summary>
     public async Task DisconnectAsync(string reason = "no reason given")
     {
         if (_disconnecting)
@@ -77,9 +85,6 @@ public class FluffyClient
         await Task.CompletedTask;
     }
 
-    /// <summary>
-    /// Gracefully disconnects the client (sync version).
-    /// </summary>
     public void Disconnect(string reason = "no reason given")
     {
         if (_disconnecting)
@@ -93,9 +98,6 @@ public class FluffyClient
         HandleDisconnect();
     }
 
-    /// <summary>
-    /// Internal cleanup logic for disconnection.
-    /// </summary>
     private void HandleDisconnect()
     {
         try
@@ -116,6 +118,13 @@ public class FluffyClient
         }
     }
 
+    /// <summary>
+    /// Internal task available to the children of FluffyClient to handle network exceptions in a standardized way.
+    /// </summary>
+    /// <param name="ex">Exception to be examined</param>
+    /// <param name="operationName">The caller or some other information to inform 
+    /// the administrator of the error location</param>
+    /// <returns></returns>
     internal async Task HandleNetworkExceptionAsync(Exception ex, string operationName)
     {
         switch (ex)
