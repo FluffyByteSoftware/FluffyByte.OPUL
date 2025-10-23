@@ -58,7 +58,7 @@ public abstract class FluffyCoreProcessBase : IFluffyCoreProcess
         catch(Exception ex)
         {
             _state = FluffyProcessState.Error;
-            Scribe.Error(ex, $"Failed to start {Name}");
+            Scribe.Error($"Failed to start {Name}", ex);
             throw;
         }
     }
@@ -87,16 +87,19 @@ public abstract class FluffyCoreProcessBase : IFluffyCoreProcess
                 await _runningTask;
             }
 
+            await OnStopAsync();
+
             _state = FluffyProcessState.Stopped;
             Scribe.Info($"{Name} stopped successfully.");
         }
         catch(Exception ex)
         {
             _state = FluffyProcessState.Error;
-            Scribe.Error(ex, $"Error stopping: {Name}");
+            Scribe.Error($"Error stopping: {Name}", ex);
             throw;
         }
     }
 
     protected abstract Task OnStartAsync(CancellationToken ct);
+    protected abstract Task OnStopAsync();
 }

@@ -21,20 +21,11 @@ public class FluffySystemOperator
     
     private FluffySystemOperator() { }
 
-    public void RegisterCore(IFluffyCoreProcess coreProcess)
-    {
-        if(CoreProcesses.Any(p => p.Name == coreProcess.Name))
-        {
-            throw new InvalidOperationException($"Core process '{coreProcess.Name}' is already registered.");
-        }
-
-        CoreProcesses.Add(coreProcess);
-        Scribe.Debug($"Registered core process: {coreProcess.Name}");
-    }
-
     public async Task StartAllAsync()
     {
         Scribe.Info("System Operator initializing all core processes...");
+
+        //CoreProcesses.Add();
 
         foreach(var process in CoreProcesses)
         {
@@ -48,6 +39,21 @@ public class FluffySystemOperator
         Scribe.Info($"System Operator is shutting down all core processes...");
 
         await _shutdownTokenSource.CancelAsync();
+
+        foreach(var process in _coreProcessesStarted.AsEnumerable().Reverse())
+        {
+            try
+            {
+                await process.StopAsync();
+            }
+            catch(Exception ex)
+            {
+                Scribe.Error($"Error stopping process '{process.Name}'", ex);
+                throw;
+            }
+        }
+
+        ClearLists();
     }
 
     private void ClearLists()

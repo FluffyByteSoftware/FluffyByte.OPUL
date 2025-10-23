@@ -155,8 +155,8 @@ public static class Scribe
     /// Logs an error with exception details.
     /// </summary>
     public static void Error(
-        Exception ex,
         string message,
+        Exception ex,
         string? context = null,
         [CallerFilePath] string file = "",
         [CallerLineNumber] int line = 0)

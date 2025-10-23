@@ -21,5 +21,6 @@ namespace FluffyByte.OPUL.Core.FluffyIO
         string Name { get; }
 
         Task StartAsync(CancellationToken cancellationToken);
+        Task StopAsync();
     }
 }
