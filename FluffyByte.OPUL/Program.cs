@@ -1,43 +1,33 @@
 ﻿using System;
+using FluffyByte.OPUL.Core.FluffyIO;
 using FluffyByte.OPUL.Core.FluffyIO.FluffyConsole;
 
 namespace FluffyByte.OPUL;
 
 public class Program
 {
-    public static CancellationTokenSource Cts { get; private set; } = new();
-
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         if(args.Length == 0)
         {
 
         }
 
+
         Scribe.Initialize();
 
-        Scribe.Info("Press enter to start the server...");
-        
+        Scribe.Debug("Preparing System Operator...");
+
+        await FluffySystemOperator.Instance.StartAllAsync();
+
+        Console.WriteLine("Press enter to terminate.");
+
         Console.ReadLine();
 
-        Start();
+        await FluffySystemOperator.Instance.ShutdownAsync();
 
-        Console.ReadLine();
-
-        Scribe.Info("Server shutting down...");
         Scribe.Info("Goodbye!");
-        Shutdown();
-
-    }
-
-    private static void Start()
-    {
-        Cts = new();
     }
 
 
-    private static void Shutdown()
-    {
-        Cts.Cancel();
-    }
 }

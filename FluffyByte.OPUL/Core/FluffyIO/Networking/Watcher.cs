@@ -1,25 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
-using FluffyByte.OPUL.Core.FluffyIO.Networking.FluffyClients;
+using FluffyByte.OPUL.Core.FluffyIO.FluffyConsole;
+using FluffyByte.OPUL.Core.FluffyIO.Networking.NetClient;
+using FluffyByte.OPUL.Tools.FluffyTypes;
 
 namespace FluffyByte.OPUL.Core.FluffyIO.Networking;
 public class Watcher(Sentinel sentinel) : FluffyCoreProcessBase
 {
-    public List<FluffyRawClient> RawClientsConnected { get; private set; } = [];
-    public List<IFluffyClient> AllFluffyClientsConnected { get; private set; } = [];
+    public ThreadSafeList<FluffyClient> FluffyClientsConnected { get; private set; } = new();
 
-    private readonly Sentinel _sentinelRef = sentinel;
+    public readonly Sentinel SentinelReference = sentinel;
 
-    private readonly Lock _lock = new();
 
     public override string Name => "Watcher";
 
     protected override async Task OnStartAsync()
     {
-        ClearAll();
+        FluffyClientsConnected.Clear();
         await Task.CompletedTask;
     }
 
@@ -29,25 +30,38 @@ public class Watcher(Sentinel sentinel) : FluffyCoreProcessBase
         await Task.CompletedTask;
     }
 
-    public void ClearAll()
+    public int GetClientsConnected
     {
-        RawClientsConnected.Clear();
-        AllFluffyClientsConnected.Clear();
-    }
-
-    public void RegisterRawClient(FluffyRawClient client)
-    {
-        lock (_lock)
+        get
         {
-            RawClientsConnected.Add(client);
+            return FluffyClientsConnected.Count;
         }
     }
 
-    public void RemoveRawClient(FluffyRawClient client)
+    public void RegisterClient(FluffyClient client)
     {
-        lock (_lock)
+        try
         {
-            RawClientsConnected.Remove(client);
+            FluffyClientsConnected.Add(client);
+        }
+        catch(Exception ex)
+        {
+            Scribe.Error($"[{Name}] - RegisterClient", ex);
         }
     }
+
+
+    public void UnregisterClient(FluffyClient client)
+    {
+        try
+        {
+            FluffyClientsConnected.Remove(client);
+            
+        }
+        catch(Exception ex)
+        {
+            Scribe.Error($"[{Name}] - UnregisterClient", ex);
+        }
+    }
+
 }

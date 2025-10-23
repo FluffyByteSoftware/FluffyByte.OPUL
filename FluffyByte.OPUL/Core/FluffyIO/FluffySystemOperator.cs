@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FluffyByte.OPUL.Core.FluffyIO.FluffyConsole;
+using FluffyByte.OPUL.Core.FluffyIO.Networking;
 
 namespace FluffyByte.OPUL.Core.FluffyIO;
 
@@ -13,19 +14,31 @@ public class FluffySystemOperator
     private static readonly Lazy<FluffySystemOperator> _instance = new(() => new());
     public static FluffySystemOperator Instance => _instance.Value;
 
-
     public List<IFluffyCoreProcess> CoreProcesses { get; private set; } = [];
+
+
+    // Processes
+    public Sentinel Sentinel { get; private set; } = new();
+
     private readonly List<IFluffyCoreProcess> _coreProcessesStarted = [];
 
     private readonly CancellationTokenSource _shutdownTokenSource = new();
-    
-    private FluffySystemOperator() { }
+
+    private readonly Lock _lock = new();
+
+    private FluffySystemOperator() 
+    {
+        lock (_lock)
+        {
+            CoreProcesses.Add(Sentinel);
+        }
+    }
 
     public async Task StartAllAsync()
     {
         Scribe.Info("System Operator initializing all core processes...");
 
-        //CoreProcesses.Add();
+        
 
         foreach(var process in CoreProcesses)
         {

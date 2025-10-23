@@ -2,13 +2,13 @@
 
 namespace FluffyByte.OPUL.Core.FluffyIO;
 
-public abstract class FluffyCoreProcessBase : IFluffyCoreProcess
+public abstract class FluffyCoreProcessBase() : IFluffyCoreProcess
 {
     public FluffyProcessState State => _state;
 
     public abstract string Name { get; }
 
-    protected CancellationTokenSource? _internalCancellation;
+    protected CancellationTokenSource? _internalCancellation = new();
 
     private FluffyProcessState _state = FluffyProcessState.Stopped;
     private Task? _runningTask;

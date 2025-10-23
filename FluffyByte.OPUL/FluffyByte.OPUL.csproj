@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <Folder Include="Core\FluffyIO\Files\" />
-    <Folder Include="Tools\" />
   </ItemGroup>
 
 </Project>
