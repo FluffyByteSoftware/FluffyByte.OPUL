@@ -17,6 +17,7 @@ public class FluffyClient
 
     public BinaryIO BinaryIO { get; private set; }
     public TextIO TextIO { get; private set; }
+    public Metrics Metrics { get; private set; }
 
     public bool Disconnecting => _disconnecting;
     public bool IsConnected => _connected;
@@ -53,6 +54,7 @@ public class FluffyClient
 
         BinaryIO = new(this, _stream, ct);
         TextIO = new(this, _stream, ct);
+        Metrics = new(this);
 
         TcpClient = tcpClient;
 

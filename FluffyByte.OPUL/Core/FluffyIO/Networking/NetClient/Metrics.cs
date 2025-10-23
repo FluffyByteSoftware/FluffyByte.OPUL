@@ -3,12 +3,14 @@ using System.Net.Sockets;
 
 namespace FluffyByte.OPUL.Core.FluffyIO.Networking.NetClient;
 
-internal class Metrics()
+public class Metrics(FluffyClient parent)
 {
     public int LastPing { get; private set; } = -20;
     public double AveragePing { get; private set; } = -20;
     public DateTime LastResponseTime { get; private set; } = DateTime.Now;
     public DateTime ConnectedAt { get; private set; } = DateTime.Now;
+
+    private readonly FluffyClient _parent = parent;
 
     /// <summary>
     /// Updates the activity timestamp to the current date and time.
@@ -31,5 +33,13 @@ internal class Metrics()
     {
         LastPing = pingMs;
         AveragePing = (AveragePing * pingMs) / 2.0;
-    }    
+    }
+
+    public double IdleTimeSeconds
+    {
+        get
+        {
+            return (DateTime.Now - LastResponseTime).TotalSeconds;
+        }
+    }
 }

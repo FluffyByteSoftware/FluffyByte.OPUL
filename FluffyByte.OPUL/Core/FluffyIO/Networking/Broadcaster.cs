@@ -4,7 +4,7 @@ namespace FluffyByte.OPUL.Core.FluffyIO.Networking;
 
 public class Broadcaster(Watcher watcher)
 {
-    public Watcher Watcher { get; private set; } = watcher;
+    private readonly Watcher _watcherRef = watcher;
 
     private readonly Sentinel _sentinelRef = watcher.SentinelReference;
 
@@ -19,9 +19,18 @@ public class Broadcaster(Watcher watcher)
     {
         Scribe.Info($"Broadcasting Message: {message}");
 
-        foreach(var client in Watcher.FluffyClientsConnected.Snapshot())
-        { 
-            await client.TextIO.WriteLineAsync(message);
+        var clients = _watcherRef.GetAllClients();
+
+        foreach(var client in clients)
+        {
+            try
+            {
+                await client.TextIO.WriteLineAsync(message);
+            }
+            catch(Exception ex)
+            {
+                Scribe.Error($"[Broadcaster] Failed to send to {client.Name}", ex);
+            }
         }
     }
 }

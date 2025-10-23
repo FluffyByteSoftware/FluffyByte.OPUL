@@ -43,19 +43,70 @@ public class BinaryIO(FluffyClient parent, NetworkStream parentStream,
             return;
         }
 
-        if(data == null || data.Length == 0)
+        if (data == null || data.Length == 0)
         {
-            Scribe.Warning($"Attempted to send empty binary data.");
+            Scribe.Warning($"[BinaryIO] Attempted to send empty binary data to {_parent.Name}");
+            return;
+        }
+
+        if(data.Length > MAX_MESSAGE_SIZE)
+        {
+            Scribe.Warning($"[BinaryIO] Attempted to send binary data exceeding max size ({data.Length} bytes) to {_parent.Name}");
             return;
         }
 
         try
         {
+            _writer.Write(data.Length);
+            _writer.Write(data);
+            _writer.Flush();
 
+            await Task.CompletedTask;
         }
         catch(Exception ex)
         {
             await _parent.HandleNetworkExceptionAsync(ex, "WriteBinaryAsync()");
+        }
+    }
+
+    public async Task<byte[]?> ReadBinaryAsync()
+    {
+        if (_parent.Disconnecting)
+        {
+            return null;
+        }
+
+        try
+        {
+            int length = _reader.ReadInt32();
+
+            if(length <= 0)
+            {
+                Scribe.Warning($"[BinaryIO] Invalid message size from {_parent.Name}: {length} bytes.");
+                return null;
+            }
+
+            if(length > MAX_MESSAGE_SIZE)
+            {
+                Scribe.Warning($"[BinaryIO] Message too large from {_parent.Name}: {length} bytes.  Max: {MAX_MESSAGE_SIZE}");
+                return null;
+            }
+
+            byte[] data = _reader.ReadBytes(length);
+
+            if(data.Length != length)
+            {
+                Scribe.Warning($"[BinaryIO] Incomplete message read from {_parent.Name}. Expected {length} bytes, got {data.Length} bytes.");
+                await _parent.DisconnectAsync("Incomplete message");
+                return null;
+            }
+
+            return data;
+        }
+        catch(Exception ex)
+        {
+            await _parent.HandleNetworkExceptionAsync(ex, "ReadBinaryAsync()");
+            return null;
         }
     }
 }

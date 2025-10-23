@@ -34,14 +34,12 @@ public class FluffySystemOperator
 
     private FluffySystemOperator() 
     {
-        lock (_lock)
-        {
-            CoreProcesses.Add(Sentinel);
-        }
+        Sentinel = new();
     }
 
     public async Task StartAllAsync()
     {
+        
         Scribe.Info("System Operator initializing all core processes...");
 
         foreach(var process in CoreProcesses)
@@ -77,5 +75,9 @@ public class FluffySystemOperator
     {
         CoreProcesses.Clear();
         _coreProcessesStarted.Clear();
+
+        Sentinel = new();
+
+        CoreProcesses.Add(Sentinel);
     }
 }
