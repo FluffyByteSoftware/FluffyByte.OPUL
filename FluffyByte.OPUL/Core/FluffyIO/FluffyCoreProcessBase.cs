@@ -3,18 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FluffyByte.OPUL.Core.FluffyIO;
 using FluffyByte.OPUL.Core.FluffyIO.FluffyConsole;
 
-namespace FluffyByte.OPUL.Core;
+namespace FluffyByte.OPUL.Core.FluffyIO;
 
-public abstract class FluffyCoreBase : IFluffyCore
+public abstract class FluffyCoreProcessBase : IFluffyCoreProcess
 {
-    private FluffyProcessState _state = FluffyProcessState.Stopped;
-
     public FluffyProcessState State => _state;
 
     public abstract string Name { get; }
+
+    private CancellationTokenSource? _internalCancellation;
+
+    private FluffyProcessState _state = FluffyProcessState.Stopped;
+    private Task? _runningTask;
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
@@ -33,7 +35,22 @@ public abstract class FluffyCoreBase : IFluffyCore
             _state = FluffyProcessState.Starting;
             Scribe.Info($"Starting {Name}...");
 
+            _internalCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            
             await OnStartAsync(cancellationToken);
+
+            _runningTask = Task.Run(async () =>
+            {
+                try
+                {
+                    await OnStartAsync(_internalCancellation.Token);
+                }
+                catch(Exception)
+                {
+                    // Expected during shutdown
+                    Scribe.Debug("Exception detected during _runningTask.  Ignoring due to shutdown.");
+                }
+            }, cancellationToken);
 
             _state = FluffyProcessState.Running;
             Scribe.Info($"{Name} started successfully.");
@@ -63,7 +80,12 @@ public abstract class FluffyCoreBase : IFluffyCore
             _state = FluffyProcessState.Stopping;
             Scribe.Info($"Stopping {Name}...");
 
-            await OnStopAsync();
+            _internalCancellation?.Cancel();
+
+            if(_runningTask != null)
+            {
+                await _runningTask;
+            }
 
             _state = FluffyProcessState.Stopped;
             Scribe.Info($"{Name} stopped successfully.");
@@ -76,6 +98,5 @@ public abstract class FluffyCoreBase : IFluffyCore
         }
     }
 
-    protected abstract Task OnStartAsync();
-    protected abstract Task OnStopAsync();
+    protected abstract Task OnStartAsync(CancellationToken ct);
 }
