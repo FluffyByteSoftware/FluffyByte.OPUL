@@ -5,6 +5,12 @@ using FluffyByte.OPUL.Core.FluffyIO.Networking.NetClient;
 
 namespace FluffyByte.OPUL.Core.FluffyIO.Networking;
 
+/// <summary>
+/// Represents a process that listens for incoming TCP connections and handles client interactions.
+/// </summary>
+/// <remarks>The <see cref="Sentinel"/> class is responsible for managing a TCP listener that accepts client
+/// connections and processes them asynchronously. It uses a <see cref="Watcher"/> to monitor its state and
+/// operations.</remarks>
 public class Sentinel : FluffyCoreProcessBase
 {
     public override string Name => "Sentinel";
@@ -17,6 +23,11 @@ public class Sentinel : FluffyCoreProcessBase
     private const string LISTENADDRESS = "10.0.0.84";
     private const int LISTENPORT = 9997;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Sentinel"/> class.
+    /// </summary>
+    /// <remarks>This constructor sets up the network listener on the specified address and port, and
+    /// initializes the watcher component to monitor the sentinel's activities.</remarks>
     public Sentinel()
     {
         _listener = new(IPAddress.Parse(LISTENADDRESS), LISTENPORT);
@@ -24,6 +35,11 @@ public class Sentinel : FluffyCoreProcessBase
         Watcher = new(this);  
     }
 
+    /// <summary>
+    /// Initializes and starts the asynchronous listening process for incoming network connections.
+    /// </summary>
+    /// <remarks>This method sets up a listener on the specified IP address and port, and begins listening for
+    /// incoming connections asynchronously.</remarks>
     protected override async Task OnStartAsync()
     {
         _listener = new(IPAddress.Parse(LISTENADDRESS), LISTENPORT);
@@ -33,11 +49,22 @@ public class Sentinel : FluffyCoreProcessBase
         return;
     }
 
+    /// <summary>
+    /// Executes the operations required to stop the service asynchronously.
+    /// </summary>
+    /// <remarks>This method is called when the service is stopping. Override this method to implement any 
+    /// custom shutdown logic. The default implementation completes immediately.</remarks>
     protected override async Task OnStopAsync()
     {
         await Task.CompletedTask;
     }
 
+    /// <summary>
+    /// Asynchronously starts the TCP listener to accept incoming client connections.
+    /// </summary>
+    /// <remarks>This method initiates the listener and begins accepting client connections asynchronously. It
+    /// sets the <see cref="IsListening"/> property to <see langword="true"/> when the listener starts successfully. If
+    /// the listener is already active, the method logs a warning and returns without making changes.</remarks>
     private async Task StartListeningAsync()
     {
         if(_internalCancellation == null)
@@ -74,6 +101,13 @@ public class Sentinel : FluffyCoreProcessBase
         }
     }
 
+    /// <summary>
+    /// Asynchronously handles communication with a connected TCP client.
+    /// </summary>
+    /// <remarks>This method initializes a new <see cref="FluffyClient"/> to manage the client connection and
+    /// performs a simple read/write operation. It sends a greeting message to the client and waits for a response. If
+    /// the response is empty or whitespace, a default message is logged. The client is then disconnected.</remarks>
+    /// <param name="client">The <see cref="TcpClient"/> representing the connected client to handle.</param>
     private async Task HandleClientAsync(TcpClient client)
     {
         if(_internalCancellation == null)

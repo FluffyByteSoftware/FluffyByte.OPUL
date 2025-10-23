@@ -18,44 +18,21 @@ public static class Scribe
     // ============================================================
 
     /// <summary>
-    /// Configuration options for the Scribe logging system.
+    /// Provides configuration settings for logging and debugging features.
     /// </summary>
+    /// <remarks>This class contains static properties to configure various aspects of logging and debugging,
+    /// such as enabling debug logs, file logging, network logging, and console color coding. It also includes settings
+    /// for maximum log file size, verbosity of stack traces, and inclusion of server context in log entries. These
+    /// settings can be adjusted to suit different development and production environments.</remarks>
     public static class Config
     {
-        /// <summary>
-        /// Enable or disable debug-level logging. Toggle this during development.
-        /// </summary>
         public static bool EnableDebugLogs { get; set; } = false;
-
-        /// <summary>
-        /// Enable or disable writing logs to file. Disable for performance testing.
-        /// </summary>
         public static bool EnableFileLogging { get; set; } = true;
-
-        /// <summary>
-        /// Enable or disable network traffic logging. Useful for diagnosing connectivity issues.
-        /// </summary>
         public static bool EnableNetworkLogging { get; set; } = false;
-
-        /// <summary>
-        /// Enable or disable console color coding. Disable for better compatibility with log viewers.
-        /// </summary>
         public static bool ColorizeConsole { get; set; } = true;
-
-        /// <summary>
-        /// Maximum log file size in megabytes before rotation occurs.
-        /// </summary>
-        public static int MaxLogFileSizeMB { get; set; } = 50;
-
-        /// <summary>
-        /// Show detailed stack traces for errors. When false, filters out framework noise.
-        /// </summary>
         public static bool VerboseStackTraces { get; set; } = false;
-
-        /// <summary>
-        /// Include server context (tick count, player count) in each log entry.
-        /// </summary>
         public static bool ShowServerContext { get; set; } = false;
+        public static int MaxLogFileSizeMB { get; set; } = 50;
     }
 
     // ============================================================

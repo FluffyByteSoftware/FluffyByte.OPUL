@@ -9,15 +9,8 @@ namespace FluffyByte.OPUL.Core.FluffyIO
 {
     public interface IFluffyCoreProcess
     {
-        /// <summary>
-        /// Gets the current state of the process.
-        /// </summary>
         FluffyProcessState State { get; }
-        
-        
-        /// <summary>
-        /// Gets the name of the process.
-        /// </summary>
+           
         string Name { get; }
 
         Task StartAsync(CancellationToken cancellationToken);

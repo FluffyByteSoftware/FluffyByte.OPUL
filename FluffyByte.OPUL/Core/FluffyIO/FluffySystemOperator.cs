@@ -9,6 +9,14 @@ using FluffyByte.OPUL.Core.FluffyIO.Networking;
 
 namespace FluffyByte.OPUL.Core.FluffyIO;
 
+
+/// <summary>
+/// Manages the lifecycle of core processes within the Fluffy system, providing functionality to start and shut down all
+/// processes in a controlled manner.
+/// </summary>
+/// <remarks>This singleton class ensures that all core processes are initialized and terminated properly,
+/// maintaining system stability. It provides thread-safe operations for managing the processes and handles exceptions
+/// during shutdown to ensure all processes are stopped gracefully.</remarks>
 public class FluffySystemOperator
 {
     private static readonly Lazy<FluffySystemOperator> _instance = new(() => new());
@@ -16,8 +24,6 @@ public class FluffySystemOperator
 
     public List<IFluffyCoreProcess> CoreProcesses { get; private set; } = [];
 
-
-    // Processes
     public Sentinel Sentinel { get; private set; } = new();
 
     private readonly List<IFluffyCoreProcess> _coreProcessesStarted = [];
@@ -37,8 +43,6 @@ public class FluffySystemOperator
     public async Task StartAllAsync()
     {
         Scribe.Info("System Operator initializing all core processes...");
-
-        
 
         foreach(var process in CoreProcesses)
         {

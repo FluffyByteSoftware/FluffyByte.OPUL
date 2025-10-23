@@ -9,26 +9,19 @@ using FluffyByte.OPUL.Core.FluffyIO.Networking.NetClient;
 using FluffyByte.OPUL.Tools.FluffyTypes;
 
 namespace FluffyByte.OPUL.Core.FluffyIO.Networking;
-public class Watcher(Sentinel sentinel) : FluffyCoreProcessBase
+
+/// <summary>
+/// Manages and monitors the connection of Fluffy clients, providing functionality to register and unregister clients.
+/// </summary>
+/// <remarks>The <see cref="Watcher"/> class is responsible for maintaining a list of connected Fluffy clients and
+/// provides methods to register and unregister these clients. It extends the <see cref="FluffyCoreProcessBase"/> class,
+/// inheriting its lifecycle management methods.</remarks>
+/// <param name="sentinel">Pass a reference to the Sentinel currently running</param>
+public class Watcher(Sentinel sentinel)
 {
     public ThreadSafeList<FluffyClient> FluffyClientsConnected { get; private set; } = new();
 
     public readonly Sentinel SentinelReference = sentinel;
-
-
-    public override string Name => "Watcher";
-
-    protected override async Task OnStartAsync()
-    {
-        FluffyClientsConnected.Clear();
-        await Task.CompletedTask;
-    }
-
-
-    protected override async Task OnStopAsync()
-    {
-        await Task.CompletedTask;
-    }
 
     public int GetClientsConnected
     {
@@ -46,7 +39,7 @@ public class Watcher(Sentinel sentinel) : FluffyCoreProcessBase
         }
         catch(Exception ex)
         {
-            Scribe.Error($"[{Name}] - RegisterClient", ex);
+            Scribe.Error($"[Watcher] - RegisterClient", ex);
         }
     }
 
@@ -60,7 +53,7 @@ public class Watcher(Sentinel sentinel) : FluffyCoreProcessBase
         }
         catch(Exception ex)
         {
-            Scribe.Error($"[{Name}] - UnregisterClient", ex);
+            Scribe.Error($"[Watcher] - UnregisterClient", ex);
         }
     }
 

@@ -26,22 +26,22 @@ public class FluffyClient
     private bool _connected;
     private bool _disconnecting;
 
-    /// <summary>
-    /// Represents a TCP client used for network communication.
-    /// </summary>
-    /// <remarks>This field is used to manage the connection to a remote host over TCP. It is initialized when
-    /// the connection is established and should be disposed of properly to release network resources.</remarks>
     private readonly TcpClient TcpClient;
     private readonly NetworkStream _stream;
     private readonly Sentinel _sentinelReference;
     private readonly IPEndPoint? _remoteEndpoint;
 
     /// <summary>
-    /// 
+    /// Initializes a new instance of the <see cref="FluffyClient"/> class using the specified TCP client, sentinel
+    /// reference, and cancellation token.
     /// </summary>
-    /// <param name="tcpClient"></param>
-    /// <param name="sentinelReference"></param>
-    /// <param name="ct"></param>
+    /// <remarks>The constructor sets up the network stream and initializes input/output operations for both
+    /// binary and text data. It also assigns a unique identifier to the client and attempts to determine the remote
+    /// endpoint's address. If the remote endpoint cannot be determined, a warning is logged, and a default name is
+    /// assigned to the client.</remarks>
+    /// <param name="tcpClient">The <see cref="TcpClient"/> used to establish the network connection. Must not be null.</param>
+    /// <param name="sentinelReference">A reference to the <see cref="Sentinel"/> associated with this client. Used for monitoring and control purposes.</param>
+    /// <param name="ct">A <see cref="CancellationToken"/> that can be used to cancel operations associated with this client.</param>
     public FluffyClient(TcpClient tcpClient, Sentinel sentinelReference, CancellationToken ct)
     {
         _id++;
@@ -70,6 +70,13 @@ public class FluffyClient
 
     }
 
+    /// <summary>
+    /// Asynchronously disconnects the current connection, specifying a reason for the disconnection.
+    /// </summary>
+    /// <remarks>This method sets the connection state to disconnected and triggers any necessary
+    /// disconnection handling. If a disconnection is already in progress, the method returns immediately without
+    /// performing any action.</remarks>
+    /// <param name="reason">The reason for the disconnection. Defaults to "no reason given" if not specified.</param>
     public async Task DisconnectAsync(string reason = "no reason given")
     {
         if (_disconnecting)
@@ -85,6 +92,13 @@ public class FluffyClient
         await Task.CompletedTask;
     }
 
+    /// <summary>
+    /// Disconnects the current connection, specifying a reason for the disconnection.
+    /// </summary>
+    /// <remarks>This method sets the connection state to disconnected and triggers any necessary
+    /// disconnection handling. If the connection is already in the process of disconnecting, the method returns
+    /// immediately without further action.</remarks>
+    /// <param name="reason">The reason for the disconnection. Defaults to "no reason given" if not specified.</param>
     public void Disconnect(string reason = "no reason given")
     {
         if (_disconnecting)
@@ -98,6 +112,12 @@ public class FluffyClient
         HandleDisconnect();
     }
 
+    /// <summary>
+    /// Handles the disconnection of a client by performing necessary cleanup operations.
+    /// </summary>
+    /// <remarks>This method logs the disconnection event, closes and disposes of the TCP client and its
+    /// associated stream, and unregisters the client from any watchers. It ensures that resources are properly released
+    /// to prevent resource leaks. If an error occurs during cleanup, it logs the error details.</remarks>
     private void HandleDisconnect()
     {
         try
