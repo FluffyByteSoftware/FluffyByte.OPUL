@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FluffyByte.OPUL.Core.FluffyIO.FluffyConsole;
+﻿using FluffyByte.OPUL.Core.FluffyIO.FluffyConsole;
 
 namespace FluffyByte.OPUL.Core.FluffyIO;
 
@@ -13,7 +8,7 @@ public abstract class FluffyCoreProcessBase : IFluffyCoreProcess
 
     public abstract string Name { get; }
 
-    private CancellationTokenSource? _internalCancellation;
+    protected CancellationTokenSource? _internalCancellation;
 
     private FluffyProcessState _state = FluffyProcessState.Stopped;
     private Task? _runningTask;
@@ -36,14 +31,12 @@ public abstract class FluffyCoreProcessBase : IFluffyCoreProcess
             Scribe.Info($"Starting {Name}...");
 
             _internalCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            
-            await OnStartAsync(cancellationToken);
-
+           
             _runningTask = Task.Run(async () =>
             {
                 try
                 {
-                    await OnStartAsync(_internalCancellation.Token);
+                    await OnStartAsync();
                 }
                 catch(Exception)
                 {
@@ -61,6 +54,8 @@ public abstract class FluffyCoreProcessBase : IFluffyCoreProcess
             Scribe.Error($"Failed to start {Name}", ex);
             throw;
         }
+
+        await Task.CompletedTask;
     }
 
     public async Task StopAsync()
@@ -100,6 +95,6 @@ public abstract class FluffyCoreProcessBase : IFluffyCoreProcess
         }
     }
 
-    protected abstract Task OnStartAsync(CancellationToken ct);
+    protected abstract Task OnStartAsync();
     protected abstract Task OnStopAsync();
 }
