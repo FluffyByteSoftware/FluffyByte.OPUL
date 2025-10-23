@@ -33,14 +33,14 @@ Networking: Custom TCP/UDP implementation using .NET sockets
 Deployment: Optimized for Linux servers, Windows-compatible for development
 
 Features
-✅ Implemented
+Implemented
 
 Multi-rate tick system (movement, messaging, spawning, cleanup)
 Custom TCP/UDP networking layer
 Binary map loading from Unity exports
 Scribe logging system with color-coded console output
 
-🚧 In Development
+In Development
 
 Tile destruction and transformation system
 Player position synchronization
@@ -48,7 +48,7 @@ NPC AI and pathfinding
 Combat mechanics
 Inventory and crafting systems
 
-📋 Planned
+Planned
 
 Building placement and management
 Monster spawning and AI
