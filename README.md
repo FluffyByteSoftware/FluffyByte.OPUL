@@ -1,5 +1,5 @@
 FluffyByte.OPUL
-OPUL (Open Persistent Universal Layer) is an authoritative, polling-based game server engine written in C# for small-scale multiplayer RPGs. Designed for persistent fantasy worlds where player actions have permanent consequences, OPUL prioritizes simulation depth over scale.
+OPUL (Open Platform for Unified Logic) is an authoritative, polling-based game server engine written in C# for small-scale multiplayer RPGs. Designed for persistent fantasy worlds where player actions have permanent consequences, OPUL prioritizes simulation depth over scale.
 Overview
 OPUL powers a living, breathing 2D fantasy world similar to Project Zomboid or Ultima Online, where up to 8 players can mine, build, craft, fight monsters, and shape a persistent environment. The server runs all game logic server-side, treating clients as thin renderers for maximum security and consistency.
 Core Principles
