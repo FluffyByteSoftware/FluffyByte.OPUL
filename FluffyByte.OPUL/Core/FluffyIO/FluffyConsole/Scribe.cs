@@ -76,7 +76,7 @@ public static class Scribe
             CheckAndRotateLogs();
         }
 
-        // Write startup banner
+        // WriteTextAsync startup banner
         Banner();
         Info($"Scribe logging system initialized");
         Info($"Log directory: {Path.GetFullPath(_logDirectory)}");
@@ -238,7 +238,7 @@ public static class Scribe
             Console.ResetColor();
         }
 
-        // Write banner to file as well
+        // WriteTextAsync banner to file as well
         if (Config.EnableFileLogging)
         {
             WriteToFile(_mainLogFileName, banner + $"\nStartup Time: {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}\n\n");

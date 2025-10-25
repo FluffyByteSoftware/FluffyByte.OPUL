@@ -2,16 +2,21 @@
 
 namespace FluffyByte.OPUL.Core.FluffyIO;
 
-public abstract class FluffyCoreProcessBase() : IFluffyCoreProcess
+public abstract class FluffyCoreProcessBase : IFluffyCoreProcess
 {
     public FluffyProcessState State => _state;
 
     public abstract string Name { get; }
 
-    protected CancellationTokenSource? _internalCancellation = new();
+    protected CancellationTokenSource? _internalCancellation;
 
     private FluffyProcessState _state = FluffyProcessState.Stopped;
     private Task? _runningTask;
+
+    public FluffyCoreProcessBase(CancellationToken cancelToken)
+    {
+        _internalCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancelToken);
+    }
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
@@ -29,9 +34,7 @@ public abstract class FluffyCoreProcessBase() : IFluffyCoreProcess
         {
             _state = FluffyProcessState.Starting;
             Scribe.Info($"Starting {Name}...");
-
-            _internalCancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-           
+            
             _runningTask = Task.Run(async () =>
             {
                 try

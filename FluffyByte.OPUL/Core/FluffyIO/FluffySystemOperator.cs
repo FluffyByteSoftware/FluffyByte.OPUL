@@ -24,7 +24,7 @@ public class FluffySystemOperator
 
     public List<IFluffyCoreProcess> CoreProcesses { get; private set; } = [];
 
-    public Sentinel Sentinel { get; private set; } = new();
+    public Sentinel? Sentinel { get; private set; }
 
     private readonly List<IFluffyCoreProcess> _coreProcessesStarted = [];
 
@@ -34,12 +34,12 @@ public class FluffySystemOperator
 
     private FluffySystemOperator() 
     {
-        Sentinel = new();
     }
 
     public async Task StartAllAsync()
     {
-        
+        ClearLists();
+
         Scribe.Info("System Operator initializing all core processes...");
 
         foreach(var process in CoreProcesses)
@@ -76,7 +76,7 @@ public class FluffySystemOperator
         CoreProcesses.Clear();
         _coreProcessesStarted.Clear();
 
-        Sentinel = new();
+        Sentinel = new(_shutdownTokenSource.Token);
 
         CoreProcesses.Add(Sentinel);
     }

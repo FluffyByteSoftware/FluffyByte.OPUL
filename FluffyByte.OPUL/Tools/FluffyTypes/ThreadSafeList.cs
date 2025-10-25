@@ -2,10 +2,18 @@
 
 namespace FluffyByte.OPUL.Tools.FluffyTypes;
 
+
 /// <summary>
-/// A thread-safe wrapper around List<T> that provides safe concurrent access.
-/// Enumeration returns a snapshot to prevent concurrent modification exceptions.
+/// Represents a thread-safe, generic collection of items that supports concurrent access and modification.
 /// </summary>
+/// <remarks>This class provides a thread-safe wrapper around a standard <see cref="List{T}"/> by using a locking
+/// mechanism  to synchronize access. It supports common list operations such as adding, removing, searching, and
+/// sorting,  while ensuring thread safety.  <para> For bulk operations or enumeration, methods like <see
+/// cref="Snapshot"/> and <see cref="ForEach"/> are provided  to minimize locking overhead and avoid potential
+/// deadlocks. Note that enumeration is performed over a snapshot  of the list, so changes made to the list during
+/// enumeration will not be reflected. </para> <para> This class is suitable for scenarios where multiple threads need
+/// to access and modify a shared collection  without requiring external synchronization. </para></remarks>
+/// <typeparam name="T">The type of elements in the list.</typeparam>
 public class ThreadSafeList<T> : IEnumerable<T>
 {
     private readonly List<T> _items = [];
@@ -13,6 +21,12 @@ public class ThreadSafeList<T> : IEnumerable<T>
 
     #region Adding Items
 
+    /// <summary>
+    /// Adds the specified item to the collection.
+    /// </summary>
+    /// <remarks>This method is thread-safe. The operation is performed within a lock to ensure  that the
+    /// collection remains consistent in multi-threaded scenarios.</remarks>
+    /// <param name="item">The item to add to the collection. Cannot be null.</param>
     public void Add(T item)
     {
         lock (_lock)
